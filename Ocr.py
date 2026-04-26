@@ -7,10 +7,19 @@ def text_extraction(full_path):
     suffix = Path(full_path).suffix.lower()
     try:
        
-        if suffix == ".jpeg" or suffix == ".png " or suffix == ".jpg":
-            print("processssing images")
-            reader = easyocr.Reader(['en'])
-            result = reader.readtext(full_path)
+        if suffix in [".jpeg", ".png", ".jpg"]:
+            print("processing images")
+            try:
+                from PIL import Image
+                import numpy as np
+                img = Image.open(full_path)
+                img.thumbnail((1200, 1200))
+                img_array = np.array(img)
+                result = reader.readtext(img_array)
+            except Exception as inner_e:
+                print(f"PIL resize failed ({inner_e}), falling back to direct load.")
+                result = reader.readtext(full_path)
+                
             text = " ".join([item[1] for item in result])   
             text = text.replace("\n", " ").strip()
             print (text)

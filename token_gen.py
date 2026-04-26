@@ -1,15 +1,11 @@
 from pathlib import Path
-import easyocr
-import Ocr
 import re
-text=''
-stopwords = {"the", "is", "at", "on", "by", "be", "can", "only"}
-def text_extraction(full_path):
-    suffix = Path(full_path).suffix.lower()
-    text=Ocr.text_extraction(full_path)
-   # print(text)
-    return text
-   
+
+stopwords = {
+    "the", "is", "at", "on", "by", "be", "can", "only", "a", "an", "and", 
+    "or", "in", "of", "to", "for", "with", "as", "it", "this", "that"
+}
+
 def tokens(text):
     text= text.lower()
     words=re.findall(r'\b[a-z]+\b',text)
