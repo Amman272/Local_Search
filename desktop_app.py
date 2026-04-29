@@ -33,13 +33,19 @@ if __name__ == '__main__':
         time.sleep(0.5)
         retries += 1
 
+    launched_native = False
     if HAVE_WEBVIEW:
-        # Create native desktop window
-        window = webview.create_window('Local File Search', f'http://localhost:{port}', width=1000, height=800)
-        webview.start()
-        # Clean up the Streamlit server when the window is closed
-        server_process.kill()
-    else:
+        try:
+            # Create native desktop window
+            window = webview.create_window('Local File Search', f'http://localhost:{port}', width=1000, height=800)
+            webview.start()
+            # Clean up the Streamlit server when the window is closed
+            server_process.kill()
+            launched_native = True
+        except Exception as e:
+            print(f"Failed to launch native window due to missing dependencies: {e}")
+            
+    if not launched_native:
         # Fallback to normal web browser
         print("Native window unavailable. Opening in default browser...")
         webbrowser.open(f'http://localhost:{port}')
