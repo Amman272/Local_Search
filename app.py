@@ -19,19 +19,24 @@ st.markdown("""
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
-    /* Search Bar */
-    .stTextInput > div > div > input {
-        padding: 10px 20px;
-        font-size: 18px;
-        color: #fff !important;
+    /* Search Bar Fix */
+    [data-testid="stTextInput"] > div {
         background-color: transparent !important;
     }
-    
-    .stTextInput > div > div {
-        border-radius: 20px !important;
+    [data-baseweb="input"] {
+        border-radius: 30px !important;
         border: 2px solid #333 !important;
         background-color: #1e1e1e !important;
-        overflow: hidden;
+        overflow: hidden !important;
+    }
+    [data-baseweb="input"] > div {
+        background-color: transparent !important;
+    }
+    [data-testid="stTextInput"] input {
+        padding: 12px 20px !important;
+        font-size: 18px !important;
+        color: #fff !important;
+        background-color: transparent !important;
     }
 
     /* Result Box Container */
