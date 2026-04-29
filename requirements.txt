@@ -1,5 +1,4 @@
 streamlit
-pywebview
 PyMuPDF
 pytesseract
 python-docx

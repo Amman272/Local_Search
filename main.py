@@ -43,29 +43,3 @@ def indexing(folder_path=None, progress_callback=None):
 
     print("Indexing completed.\n")
     return True
-def searching():
-        try:
-            search_input = input("enter the words you want to search (or 'exit' to quit): ")
-        except EOFError:
-            return
-            
-        if search_input.lower() == 'exit':
-            return
-            
-        search_words = search_input.lower().split()
-
-        if len(search_words) == 0:
-            print("please enter at least one word")
-        
-
-        result = sql.search(search_words)
-
-        if len(result) == 0:
-            print("no file found")
-        else:
-            print("\nfiles found:\n")
-            for file in result:
-                found_path = os.path.join(folder_path, file[0])
-                print(f'"{found_path}" | score: {file[1]}')
-                
-        

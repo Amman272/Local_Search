@@ -49,6 +49,28 @@ if %ERRORLEVEL% NEQ 0 (
 echo [INFO] Checking and installing required dependencies (this may take a moment)...
 python -m pip install -r requirements.txt -q
 
+:: Install Pywebview independently (graceful fail)
+echo [INFO] Setting up native window support...
+python -m pip install pywebview -q >nul 2>&1
+
+:: Create Desktop Shortcut
+echo [INFO] Creating Desktop Shortcut...
+set "VBS_SCRIPT=%TEMP%\create_shortcut.vbs"
+echo Set oWS = WScript.CreateObject("WScript.Shell") > "%VBS_SCRIPT%"
+echo sLinkFile = "%USERPROFILE%\Desktop\Local File Search.lnk" >> "%VBS_SCRIPT%"
+echo Set oLink = oWS.CreateShortcut(sLinkFile) >> "%VBS_SCRIPT%"
+echo oLink.TargetPath = "python.exe" >> "%VBS_SCRIPT%"
+echo oLink.Arguments = """%CD%\desktop_app.py""" >> "%VBS_SCRIPT%"
+echo oLink.WorkingDirectory = """%CD%""" >> "%VBS_SCRIPT%"
+echo oLink.Save >> "%VBS_SCRIPT%"
+cscript /nologo "%VBS_SCRIPT%"
+del "%VBS_SCRIPT%"
+
 :: 4. Run the desktop app
 echo [INFO] Launching Application...
 python desktop_app.py
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Application crashed!
+    pause
+)
+pause
