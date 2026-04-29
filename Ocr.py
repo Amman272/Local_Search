@@ -1,15 +1,35 @@
+import os
 from pathlib import Path
 import pytesseract
 import fitz
 from docx import Document
+import shutil
 
-# IMPORTANT: If Tesseract isn't in your system PATH, uncomment and set this line to your install location:
-pytesseract.pytesseract.tesseract_cmd = r'C:\Users\amman\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+TESSERACT_AVAILABLE = False
+tesseract_path = shutil.which("tesseract")
+
+if not tesseract_path:
+    common_paths = [
+        r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+        r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+        os.path.expandvars(r"%LOCALAPPDATA%\Programs\Tesseract-OCR\tesseract.exe")
+    ]
+    for p in common_paths:
+        if os.path.exists(p):
+            tesseract_path = p
+            break
+
+if tesseract_path:
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
+    TESSERACT_AVAILABLE = True
 
 def text_extraction(full_path):
     suffix = Path(full_path).suffix.lower()
     try:
         if suffix in [".jpeg", ".png", ".jpg"]:
+            if not TESSERACT_AVAILABLE:
+                print(f"Skipping {full_path} - Tesseract OCR not installed.")
+                return ""
             print("processing images with tesseract")
             from PIL import Image
             img = Image.open(full_path)

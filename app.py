@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import filedialog
 import sql
 import main
+import Ocr
 
 st.set_page_config(page_title="Local File Search", layout="wide")
 
@@ -97,6 +98,9 @@ def open_file(path):
 has_files = sql.check_has_files()
 
 if not has_files:
+    if not getattr(Ocr, 'TESSERACT_AVAILABLE', True):
+        st.warning("⚠️ Tesseract OCR is not installed on this system. Image files will be skipped during indexing.")
+        
     st.markdown("<h1 style='text-align: center; margin-top: 10%;'>File Search Indexer</h1>", unsafe_allow_html=True)
     st.markdown("<h4 style='text-align: center; color: #aaa; margin-bottom: 30px;'>No files indexed yet. Please select a folder to begin.</h4>", unsafe_allow_html=True)
     
