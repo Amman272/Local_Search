@@ -1,5 +1,5 @@
 import sqlite3
-conn= sqlite3.connect("file_id.db")
+conn = sqlite3.connect("file_id.db", check_same_thread=False)
 
 cursor =conn.cursor()
 
@@ -30,6 +30,30 @@ def tokensation(file_id, word):
 
 def commit():
     conn.commit()
+
+def check_has_files():
+    try:
+        cursor.execute("SELECT COUNT(*) FROM FILE_ID")
+        count = cursor.fetchone()[0]
+        return count > 0
+    except sqlite3.OperationalError:
+        return False
+
+def clear_db():
+    cursor.execute("DELETE FROM FILE_ID")
+    cursor.execute("DELETE FROM INDEXING")
+    conn.commit()
+
+def get_current_directory():
+    try:
+        cursor.execute("SELECT FILENAME FROM FILE_ID LIMIT 1")
+        result = cursor.fetchone()
+        if result:
+            import os
+            return os.path.dirname(result[0])
+        return None
+    except sqlite3.OperationalError:
+        return None
 def search(words):
     placeholders = ",".join(["?"] * len(words))
 

@@ -1,28 +1,21 @@
 from pathlib import Path
-import easyocr
+import pytesseract
 import fitz
 from docx import Document
-reader = easyocr.Reader(['en'])
+
+# IMPORTANT: If Tesseract isn't in your system PATH, uncomment and set this line to your install location:
+pytesseract.pytesseract.tesseract_cmd = r'C:\Users\amman\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+
 def text_extraction(full_path):
     suffix = Path(full_path).suffix.lower()
     try:
-       
         if suffix in [".jpeg", ".png", ".jpg"]:
-            print("processing images")
-            try:
-                from PIL import Image
-                import numpy as np
-                img = Image.open(full_path)
-                img.thumbnail((1200, 1200))
-                img_array = np.array(img)
-                result = reader.readtext(img_array)
-            except Exception as inner_e:
-                print(f"PIL resize failed ({inner_e}), falling back to direct load.")
-                result = reader.readtext(full_path)
-                
-            text = " ".join([item[1] for item in result])   
+            print("processing images with tesseract")
+            from PIL import Image
+            img = Image.open(full_path)
+            text = pytesseract.image_to_string(img)
             text = text.replace("\n", " ").strip()
-            print (text)
+            print(text)
             return text
         elif suffix == ".pdf":
             doc=fitz.open(full_path)
