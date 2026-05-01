@@ -49,9 +49,9 @@ if %ERRORLEVEL% NEQ 0 (
 echo [INFO] Checking and installing required dependencies (this may take a moment)...
 python -m pip install -r requirements.txt -q
 
-:: Install Pywebview independently (graceful fail)
-echo [INFO] Setting up native window support...
-python -m pip install pywebview -q >nul 2>&1
+@REM :: Install Pywebview independently (graceful fail)
+@REM echo [INFO] Setting up native window support...
+@REM python -m pip install pywebview -q >nul 2>&1
 
 :: Create Desktop Shortcut
 if exist "create_shortcut.bat" (
