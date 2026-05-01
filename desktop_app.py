@@ -14,12 +14,66 @@ def check_port(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('localhost', port)) == 0
 
+import ctypes
+import os
+
+class JOBOBJECT_BASIC_LIMIT_INFORMATION(ctypes.Structure):
+    _fields_ = [
+        ('PerProcessUserTimeLimit', ctypes.c_int64),
+        ('PerJobUserTimeLimit', ctypes.c_int64),
+        ('LimitFlags', ctypes.c_uint32),
+        ('MinimumWorkingSetSize', ctypes.c_size_t),
+        ('MaximumWorkingSetSize', ctypes.c_size_t),
+        ('ActiveProcessLimit', ctypes.c_uint32),
+        ('Affinity', ctypes.c_size_t),
+        ('PriorityClass', ctypes.c_uint32),
+        ('SchedulingClass', ctypes.c_uint32),
+    ]
+
+class IO_COUNTERS(ctypes.Structure):
+    _fields_ = [
+        ('ReadOperationCount', ctypes.c_uint64),
+        ('WriteOperationCount', ctypes.c_uint64),
+        ('OtherOperationCount', ctypes.c_uint64),
+        ('ReadTransferCount', ctypes.c_uint64),
+        ('WriteTransferCount', ctypes.c_uint64),
+        ('OtherTransferCount', ctypes.c_uint64),
+    ]
+
+class JOBOBJECT_EXTENDED_LIMIT_INFORMATION(ctypes.Structure):
+    _fields_ = [
+        ('BasicLimitInformation', JOBOBJECT_BASIC_LIMIT_INFORMATION),
+        ('IoInfo', IO_COUNTERS),
+        ('ProcessMemoryLimit', ctypes.c_size_t),
+        ('JobMemoryLimit', ctypes.c_size_t),
+        ('PeakProcessMemoryUsed', ctypes.c_size_t),
+        ('PeakJobMemoryUsed', ctypes.c_size_t),
+    ]
+
+_job_handle = None
+
+def assign_process_to_job(process):
+    if os.name == 'nt':
+        try:
+            job = ctypes.windll.kernel32.CreateJobObjectW(None, None)
+            if job:
+                info = JOBOBJECT_EXTENDED_LIMIT_INFORMATION()
+                info.BasicLimitInformation.LimitFlags = 0x2000 # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+                ctypes.windll.kernel32.SetInformationJobObject(job, 9, ctypes.byref(info), ctypes.sizeof(info))
+                ctypes.windll.kernel32.AssignProcessToJobObject(job, int(process._handle))
+                global _job_handle
+                _job_handle = job
+        except Exception:
+            pass
+
 def run_streamlit():
-    return subprocess.Popen(
+    process = subprocess.Popen(
         [sys.executable, "-m", "streamlit", "run", "app.py", "--server.headless=true"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
+    assign_process_to_job(process)
+    return process
 
 if __name__ == '__main__':
     port = 8501
