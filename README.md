@@ -76,11 +76,11 @@ When a user types a query into the search bar, the system skips scanning the act
 
 ```mermaid
 graph LR
-    A[User Search: 'invoice 2026'] --> B(token_gen.py)
-    B -->|Cleans input| C['invoice', '2026']
-    C --> D{sql.py}
-    D -->|SELECT SUM(FREQUENCY)| E[(SQLite Database)]
-    E -->|Returns Ranked Files| F[Streamlit Grid/List UI]
+     A["User Search: 'invoice 2026'"] --> B("token_gen.py")
+    B -->|"Cleans input"| C["'invoice', '2026'"]
+    C --> D{"sql.py"}
+    D -->|"SELECT SUM(FREQUENCY)"| E[("SQLite Database")]
+    E -->|"Returns Ranked Files"| F["Streamlit Grid/List UI"]
 ```
 
 ---
