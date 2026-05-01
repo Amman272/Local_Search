@@ -1,5 +1,11 @@
 import os
 import sys
+import io
+
+# Prevent UnicodeEncodeError on Windows consoles with special filename characters
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout.reconfigure(errors='replace')
+
 import Ocr
 import token_gen
 import sql
